@@ -2,6 +2,9 @@
 
 A responsive, dependency-free prototype of a local business operating system.
 
+- Live site: https://zotoz-ai.vercel.app
+- GitHub: https://github.com/AjitOv/zotoz-ai (private)
+
 ## Preview locally
 
 Run `python3 -m http.server 4178 --directory dist` in this directory and open `http://localhost:4178`.
@@ -24,4 +27,12 @@ The assistant is a local, rule-based simulation. All business data is fictional;
 
 ## Deployment
 
-Push changes to the GitHub repository’s default branch to deploy through the connected Vercel project. Local deployment metadata and environment files are excluded from version control.
+The site is deployed to the `zotoz-ai` project under `ajitovs-projects` on Vercel. To deploy updates from this directory, run:
+
+```sh
+vercel deploy --prod --scope ajitovs-projects
+```
+
+GitHub automatic deployments are not connected yet: Vercel needs access to the private `AjitOv/zotoz-ai` repository. After granting repository access to the Vercel GitHub integration, connect it with `vercel git connect https://github.com/AjitOv/zotoz-ai.git --scope ajitovs-projects`.
+
+Local deployment metadata and environment files are excluded from version control.
