@@ -1,6 +1,6 @@
 # Zotoz AI
 
-A responsive, dependency-free prototype of a local business operating system.
+A responsive, dependency-free prototype of an AI business operating system for small and medium-sized enterprises (SMEs).
 
 - Live site: https://zotoz-ai.vercel.app
 - GitHub: https://github.com/AjitOv/zotoz-ai (private)
@@ -12,7 +12,7 @@ Run `python3 -m http.server 4178 --directory dist` in this directory and open `h
 ## Included
 
 - Marketing homepage with interactive product preview and a how-it-works dialog.
-- Dashboard with sample sales, inquiries, follow-ups, team tasks, and stock alerts.
+- Dashboard for Apex Supplies, a sample SME, with B2B sales, customer inquiries, quotation follow-ups, team tasks, and dispatch stock alerts.
 - Customer inquiry replies with editable suggested drafts.
 - Individual or batch follow-ups with message review.
 - Task completion, filters, sales period selection, holiday mode, and reviewed alerts.
