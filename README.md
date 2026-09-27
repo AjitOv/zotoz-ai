@@ -1,38 +1,33 @@
 # Zotoz AI
 
-A responsive, dependency-free prototype of an AI business operating system for small and medium-sized enterprises (SMEs).
+An AI business operating system for SMEs, with a sample dashboard and a separate authenticated owner-agent pilot.
 
 - Live site: https://zotoz-ai.vercel.app
+- Owner workspace: https://zotoz-ai.vercel.app/#teach
 - GitHub: https://github.com/AjitOv/zotoz-ai (private)
 
-## Preview locally
+## Owner workspace
 
-Run `python3 -m http.server 4178 --directory dist` in this directory and open `http://localhost:4178`.
+The owner saves a business interview, generates and approves a playbook, reviews AI recommendations for customer requests, and receives a daily brief. Supabase provides email sign-in and private business storage. Server-side Gemini or OpenAI calls draft playbooks, recommendations, and briefs. Every recommendation needs owner approval; replies are copied for manual sending.
 
-## Included
+See [SETUP.md](SETUP.md) for environment variables, the SQL migration, sign-in configuration, and pilot limitations. Live features require configured credentials. No live sales, WhatsApp, CRM, or inventory integrations are included.
 
-- Marketing homepage with interactive product preview and a how-it-works dialog.
-- Dashboard for Apex Supplies, a sample SME, with B2B sales, customer inquiries, quotation follow-ups, team tasks, and dispatch stock alerts.
-- Customer inquiry replies with editable suggested drafts.
-- Individual or batch follow-ups with message review.
-- Task completion, filters, sales period selection, holiday mode, and reviewed alerts.
-- A WhatsApp-style assistant that answers common business questions from current demo state.
-- Keyboard-accessible native dialogs, responsive navigation, and optional WebMCP tools.
+## Sample dashboard
 
-The assistant is a local, rule-based simulation. All business data is fictional; replies and follow-ups do not send external messages. State lasts for the current page session and resets on refresh. There is no authentication, billing, or production data connection.
+The marketing homepage and Apex Supplies dashboard use fictional business data. Inquiry replies, follow-ups, tasks, alerts, and the WhatsApp-style assistant are interactive simulations. Demo state resets on refresh and does not enter the live owner workspace.
 
-## Structure
+## Development
 
-`dist/index.html`, `dist/styles.css`, and `dist/app.js` are the complete site. There is no build step or dependency installation. Vercel serves the `dist` directory using `vercel.json`.
+Run `npm ci`, then `npm test`. Use `vercel dev` to run the frontend and API together. A static preview (`python3 -m http.server 4178 --directory dist`) can show the marketing and demo screens, but cannot run authentication or live AI.
+
+The frontend is in `dist/`; the Vercel API is `api/owner.js`, shared validation is in `lib/`, and the database migration is in `supabase/migrations/`.
 
 ## Deployment
 
-The site is deployed to the `zotoz-ai` project under `ajitovs-projects` on Vercel. To deploy updates from this directory, run:
+Deploy to the existing Zotoz Vercel project:
 
 ```sh
 vercel deploy --prod --scope ajitovs-projects
 ```
 
-GitHub automatic deployments are not connected yet: Vercel needs access to the private `AjitOv/zotoz-ai` repository. After granting repository access to the Vercel GitHub integration, connect it with `vercel git connect https://github.com/AjitOv/zotoz-ai.git --scope ajitovs-projects`.
-
-Local deployment metadata and environment files are excluded from version control.
+GitHub automatic deployments are not connected yet; Vercel needs access to the private repository. Environment files and local deployment metadata are excluded from version control.

@@ -3,3 +3,6 @@
 .sites-runtime
 .env*
 README.md
+SETUP.md
+tests
+supabase
