@@ -80,8 +80,11 @@ export default async function handler(req, res) {
     if (req.method === 'POST' && action === 'login') {
       const email = text(input.email, 'email address', 254).toLowerCase();
       if (!allowedEmails().includes(email)) throw new AppError('This email has not been invited to the owner pilot.', 403);
-      const { error } = await client().auth.signInWithOtp({ email, options: { emailRedirectTo: `${origin()}/#teach`, shouldCreateUser: true } });
-      if (error) throw new AppError('Could not send a sign-in link. Please wait a minute and check Supabase email settings.', 429);
+      const { error } = await client().auth.signInWithOtp({ email, options: { emailRedirectTo: `${origin()}/`, shouldCreateUser: true } });
+      if (error) {
+        if (error.code === 'over_email_send_rate_limit' || error.code === 'over_request_rate_limit' || error.status === 429) throw new AppError('Please wait before requesting another link. Check your inbox and use the latest email once. If the email quota is reached, try again later.', 429);
+        throw new AppError('Sign-in email is unavailable. Please check the project’s email provider configuration.', 503);
+      }
       return res.status(200).json({ sent: true });
     }
     if (req.method === 'POST' && action === 'session') {

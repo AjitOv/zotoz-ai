@@ -1,7 +1,7 @@
 /* Live owner workspace. The sample dashboard remains a separate experience. */
 window.OwnerApp = (() => {
   const pages = { teach: 'Teach Zotoz', playbook: 'My Playbook', approvals: 'Approvals', activity: 'Activity', brief: 'Daily Brief' };
-  const ui = { loaded: false, loading: false, busy: false, error: '', connections: null, data: null, email: '', sent: false, profileDraft: null, bookDraft: null, caseDraft: null, reviewDrafts: {}, filter: 'pending' };
+  const ui = { loaded: false, loading: false, busy: false, error: '', connections: null, data: null, email: '', sent: false, resendAfter: 0, profileDraft: null, bookDraft: null, caseDraft: null, reviewDrafts: {}, filter: 'pending' };
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
   const date = value => new Date(value).toLocaleString(undefined, { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
   const redraw = () => { if (typeof render === 'function' && pages[location.hash.slice(1)]) render(); };
@@ -71,7 +71,7 @@ window.OwnerApp = (() => {
   document.addEventListener('submit', async e=>{
     const form=e.target.closest('[data-owner-form]');if(!form)return;e.preventDefault();if(ui.busy)return;
     const f=new FormData(form);
-    if(form.dataset.ownerForm==='login') { ui.email=String(f.get('email'));ui.busy=true;ui.error='';redraw();try{await api('login',{email:ui.email});ui.sent=true}catch(error){ui.error=error.message}finally{ui.busy=false;redraw()}return; }
+    if(form.dataset.ownerForm==='login') { if(Date.now()<ui.resendAfter){ui.error='Please wait a minute before requesting another link. Use the latest email once.';redraw();return} ui.email=String(f.get('email'));ui.busy=true;ui.error='';redraw();try{await api('login',{email:ui.email});ui.sent=true;ui.resendAfter=Date.now()+60000}catch(error){ui.error=error.message}finally{ui.busy=false;redraw()}return; }
     if(form.dataset.ownerForm==='profile'){ui.profileDraft=captureProfile(form);await mutate('saveProfile',{profile:ui.profileDraft});}
     if(form.dataset.ownerForm==='playbook'){ui.bookDraft=captureBook(form);await mutate('activatePlaybook',{playbook:ui.bookDraft},'approvals');}
     if(form.dataset.ownerForm==='case'){ui.caseDraft=captureProfile(form);await mutate('evaluateCase',{case:ui.caseDraft});}
@@ -87,7 +87,10 @@ window.OwnerApp = (() => {
     if(el.dataset.owner==='refresh'){ui.error='';ui.loaded=false;load();redraw();}
     if(el.dataset.owner==='logout'){try{await api('logout');ui.data=null;ui.profileDraft=null;ui.bookDraft=null;ui.caseDraft=null;ui.reviewDrafts={};ui.email='';ui.sent=false;ui.error='';redraw()}catch(error){ui.error=error.message;redraw()}}
   });
-  const authHash=new URLSearchParams(location.hash.slice(1));
+  // Older emails included #teach before Supabase's token fragment.
+  const fragment = location.hash.slice(1);
+  const callbackStart = fragment.search(/(?:^|[#&])(?:access_token|error|error_description)=/);
+  const authHash=new URLSearchParams(callbackStart < 0 ? fragment : fragment.slice(callbackStart).replace(/^[#&]/, ''));
   if(authHash.has('access_token')) {
     const access_token=authHash.get('access_token'),refresh_token=authHash.get('refresh_token');
     history.replaceState(null,'',location.pathname+'#teach');ui.loading=true;
