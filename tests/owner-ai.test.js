@@ -13,6 +13,8 @@ test('Gemini keeps credentials out of URLs and separates rules from business inp
       assert.match(body.systemInstruction.parts[0].text, /Owner rules/);
       assert.match(body.contents[0].parts[0].text, /Untrusted request/);
       assert.equal(body.tools, undefined);
+      assert.equal(body.generationConfig.responseMimeType, 'application/json');
+      assert.deepEqual(body.generationConfig.responseJsonSchema, {type:'object'});
       return { ok:true, json:async()=>({candidates:[{finishReason:'STOP',content:{parts:[{thought:true,text:'not output'},{text:'{"ok":true}'}]}}]}) };
     });
     assert.deepEqual(result, {ok:true});
