@@ -8,14 +8,26 @@ Set these in the `zotoz-ai` project's environment settings, then redeploy:
 
 - `SUPABASE_URL`: the dedicated Zotoz project URL.
 - `SUPABASE_PUBLISHABLE_KEY`: the project's publishable key (legacy anon key also works). Never use a service-role key here.
-- `GEMINI_API_KEY`: a Google Gemini API key, server-side only. Gemini is used when this is set.
+- `OPENROUTER_API_KEY`: recommended AI provider key, stored server-side only. When set, Zotoz uses OpenRouter before any other configured AI provider.
+- `OPENROUTER_MODEL`: optional OpenRouter model slug; defaults to `openai/gpt-4o-mini`. Choose a model that supports JSON Schema structured outputs in your OpenRouter account.
+- `GEMINI_API_KEY`: optional fallback provider key, server-side only. Used when OpenRouter is not configured.
 - `GEMINI_MODEL`: optional; defaults to `gemini-3.8-flash`.
-- `OPENAI_API_KEY`: optional alternative OpenAI key, used only when no Gemini key is set.
+- `OPENAI_API_KEY`: optional fallback OpenAI key, used only when neither OpenRouter nor Gemini is configured.
+- `OPENAI_MODEL`: optional; defaults to `gpt-5-mini`.
 - `OWNER_EMAILS`: comma-separated email addresses invited to the pilot.
 - `APP_ORIGIN`: `https://zotoz-ai.vercel.app` (also the default).
-- `OPENAI_MODEL`: optional; defaults to `gpt-5-mini`.
 
-The API never returns the keys. Authentication tokens are stored in Secure, HttpOnly, SameSite cookies, not browser local storage. The initial email callback tokens are immediately removed from the URL.
+The API never returns the keys. Never put provider keys in frontend code, `dist/`, or public environment variables such as `VITE_*`. Authentication tokens are stored in Secure, HttpOnly, SameSite cookies, not browser local storage. The initial email callback tokens are immediately removed from the URL.
+
+## Connect OpenRouter
+
+1. In Vercel, open the `zotoz-ai` project → Settings → Environment Variables.
+2. Add `OPENROUTER_API_KEY` with your newly generated OpenRouter key. Select Production (and Preview/Development if needed).
+3. Optionally add `OPENROUTER_MODEL` to select a model available to your OpenRouter account that supports JSON Schema structured outputs. Otherwise the code uses `openai/gpt-4o-mini`.
+4. Save the variables and redeploy the project. OpenRouter takes precedence over Gemini and OpenAI when multiple provider keys exist.
+5. Sign in to the owner workspace and test playbook generation, customer request recommendations, and the daily brief. The existing owner approval and usage-limit safeguards remain in place.
+
+The OpenRouter integration uses the OpenAI-compatible Chat Completions endpoint, requests schema-constrained JSON, and sends Zotoz attribution headers. Keys are never sent to the browser or returned by the API.
 
 ## Supabase
 
@@ -39,7 +51,7 @@ Updating the playbook invalidates pending recommendations until they are re-eval
 
 ## Scope and limitations
 
-- Live Gemini or OpenAI calls for playbook drafting, customer-request recommendations, and briefs.
+- Live OpenRouter, Gemini, or OpenAI calls for playbook drafting, customer-request recommendations, and briefs.
 - Authenticated Supabase persistence for each owner's interview, playbook versions, requests, decisions, and recent activity.
 - No live WhatsApp, CRM, inventory, sales, payments, or autonomous execution connection yet. Verified facts are entered manually.
 - This pilot keeps 100 customer requests and the latest 500 activity entries per workspace. It is not an immutable compliance audit log.
@@ -48,8 +60,8 @@ Updating the playbook invalidates pending recommendations until they are re-eval
 
 ## Development
 
-Install with `npm ci`; run `npm test`. Use `vercel dev` for the API and frontend. For local authenticated use, configure `APP_ORIGIN` and HTTPS because auth cookies are Secure. A plain static server can preview the marketing pages but cannot run the owner API.
+Install with `npm ci`; run `npm test`. Use `vercel dev` to run the API and frontend. For local authenticated use, configure `APP_ORIGIN` and HTTPS because auth cookies are Secure. A plain static server can preview the marketing pages but cannot run the owner API.
 
-Implementation references: [OpenAI structured outputs](https://developers.openai.com/api/docs/guides/structured-outputs), [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), [Supabase email sign-in](https://supabase.com/docs/reference/javascript/auth-signinwithotp), [Vercel Node.js functions](https://vercel.com/docs/functions/runtimes/node-js).
+Implementation references: [OpenAI structured outputs](https://developers.openai.com/api/docs/guides/structured-outputs), [OpenRouter structured outputs](https://openrouter.ai/docs/guides/features/structured-outputs), [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), [Supabase email sign-in](https://supabase.com/docs/reference/javascript/auth-signinwithotp), [Vercel Node.js functions](https://vercel.com/docs/functions/runtimes/node-js).
 
 Gemini reference: [Structured outputs](https://ai.google.dev/gemini-api/docs/generate-content/structured-output).
