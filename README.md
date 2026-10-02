@@ -1,6 +1,6 @@
 # Zotoz AI
 
-An AI business operating system for SMEs, with a sample dashboard and a separate authenticated owner-agent pilot.
+An AI business operating system for SMEs that gives owners more time for important decisions, customers, and growth by automating repetitive, lower-priority work. Includes a sample dashboard and a separate authenticated owner-agent pilot.
 
 - Live site: https://zotoz-ai.vercel.app
 - Owner workspace: https://zotoz-ai.vercel.app/#teach
